@@ -5,63 +5,54 @@ using TMPro;
 
 public class StartUI_MG : MonoBehaviour
 {
-    CanvasGroup[] groups;
-    CanvasGroup allGroups;
-    TMP_InputField[] fields;
-    List<string> checkNull;
+    [SerializeField] TextMeshProUGUI m_ErrorMS;
+    [SerializeField] CanvasGroup[] m_groups;
+    TMP_InputField[] m_fields;
+    List<string> m_checkNull;
 
     void Awake()
     {
-        groups = GetComponentsInChildren<CanvasGroup>();
-        fields = GetComponentsInChildren<TMP_InputField>();
-        foreach (CanvasGroup cg in groups)
+        m_groups = GetComponentsInChildren<CanvasGroup>();
+        m_fields = GetComponentsInChildren<TMP_InputField>();
+        UI_off();
+        m_checkNull = new List<string>();
+        for (int i = 0; i < m_fields.Length; i++)
         {
-            allGroups = cg;
-            // if (cg.name == transform.name) return;
-            cg.alpha = 0;
-            cg.blocksRaycasts = false;
-        }
-        checkNull = new List<string>();
-        for (int i = 0; i < fields.Length; i++)
-        {
-            checkNull.Add(fields[i].text);
+            m_checkNull.Add(m_fields[i].text);
         }
     }
 
     void Start()
     {
-        groups[0].alpha = 1;
-        groups[0].blocksRaycasts = true;
-        groups[1].alpha = 1;
-        groups[1].blocksRaycasts = true;
-    }
-
-    void Update()
-    {
+        m_groups[0].alpha = 1;
+        m_groups[0].blocksRaycasts = true;
+        m_groups[1].alpha = 1;
+        m_groups[1].blocksRaycasts = true;
     }
 
     public void Click_ID()
     {
-        if (fields[0].text == checkNull[0])
+        if (m_fields[0].text == m_checkNull[0])
         {
-            return;
+            StartCoroutine("ErrorMessage");
+            m_ErrorMS.text = "Please enter the ID";
         }
         else
         {
-            PhotonMG.instance.m_userID = fields[0].text;
-            groups[1].alpha = 0;
-            groups[1].blocksRaycasts = false;
-            groups[2].alpha = 1;
-            groups[2].blocksRaycasts = true;
+            PhotonMG.instance.m_userID = m_fields[0].text;
+            m_groups[1].alpha = 0;
+            m_groups[1].blocksRaycasts = false;
+            m_groups[2].alpha = 1;
+            m_groups[2].blocksRaycasts = true;
         }
     }
 
     public void Click_Drone()
     {
-        groups[2].alpha = 0;
-        groups[2].blocksRaycasts = false;
-        groups[3].alpha = 1;
-        groups[3].blocksRaycasts = true;
+        m_groups[2].alpha = 0;
+        m_groups[2].blocksRaycasts = false;
+        m_groups[3].alpha = 1;
+        m_groups[3].blocksRaycasts = true;
         PhotonMG.instance.Click_Connect();
     }
     public void Click_JoinRoom()
@@ -70,29 +61,50 @@ public class StartUI_MG : MonoBehaviour
     }
     public void Click_CreateRoom()
     {
-        groups[3].alpha = 0.1f;
-        groups[3].blocksRaycasts = false;
-        groups[4].alpha = 1;
-        groups[4].blocksRaycasts = true;
+        m_groups[3].alpha = 0.1f;
+        m_groups[3].blocksRaycasts = false;
+        m_groups[4].alpha = 1;
+        m_groups[4].blocksRaycasts = true;
     }
     public void Click_Create()
     {
-        if (fields[1].text == checkNull[1])
+        if (m_fields[1].text == m_checkNull[1])
         {
+            StartCoroutine("ErrorMessage");
+            m_ErrorMS.text = "Please enter the Room Name";
             return;
         }
         else
         {
-            PhotonMG.instance.m_roomName = fields[1].text;
+            PhotonMG.instance.m_roomName = m_fields[1].text;
             PhotonMG.instance.Click_CreateRoom();
-            Click_Close();
+            UI_off();
         }
     }
     public void Click_Close()
     {
-        groups[4].alpha = 0;
-        groups[4].blocksRaycasts = false;
-        groups[3].alpha = 1;
-        groups[3].blocksRaycasts = true;
+        m_groups[4].alpha = 0;
+        m_groups[4].blocksRaycasts = false;
+        m_groups[3].alpha = 1;
+        m_groups[3].blocksRaycasts = true;
+    }
+
+    void UI_off()
+    {
+        foreach (CanvasGroup cg in m_groups)
+        {
+            cg.alpha = 0;
+            cg.blocksRaycasts = false;
+        }
+    }
+
+
+    IEnumerator ErrorMessage()
+    {
+        m_groups[5].alpha = 1;
+        Debug.Log("ErrorMessage");
+        yield return new WaitForSeconds(2f);
+        m_groups[5].alpha = 0;
+        Debug.Log("Off ErrorMessage");
     }
 }
